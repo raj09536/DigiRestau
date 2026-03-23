@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 
 import UpgradeModal from '@/components/UpgradeModal';
+import WaitingScreen from '@/components/WaitingScreen';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -32,6 +33,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const router = useRouter();
     const supabase = createClient();
     const { restaurant, setRestaurant } = useRestaurant();
+    const [pendingRequest, setPendingRequest] = useState<any>(null);
 
     useEffect(() => {
         const fetchRestaurantAndData = async () => {
@@ -59,6 +61,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         };
         fetchRestaurantAndData();
     }, []);
+
+    useEffect(() => {
+        const checkPending = async () => {
+            if (!restaurant) return;
+            const { data } = await supabase
+                .from('subscription_requests')
+                .select('*')
+                .eq('restaurant_id', restaurant.id)
+                .eq('status', 'pending')
+                .maybeSingle();
+            setPendingRequest(data);
+        };
+        checkPending();
+    }, [restaurant]);
 
     // 5-Minute Upgrade Popup for Free Users
     useEffect(() => {
@@ -119,7 +135,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return (
         <div className="min-h-screen flex dashboard-container font-outfit selection:bg-saffron/30">
             {/* Sidebar */}
-            <aside className={`fixed inset-y-0 left-0 z-50 w-[240px] flex flex-col transition-transform duration-500 lg:translate-x-0 dashboard-sidebar border-r border-white/5 ${sidebarOpen ? 'translate-x-0 shadow-2xl shadow-black' : '-translate-x-full'}`}>
+            <aside className={`fixed inset-y-0 left-0 z-600 w-[240px] flex flex-col transition-transform duration-500 lg:translate-x-0 dashboard-sidebar border-r border-white/5 ${sidebarOpen ? 'translate-x-0 shadow-2xl shadow-black' : '-translate-x-full'}`}>
                 <div className="flex flex-col h-full">
                     {/* Logo Section */}
                     <div className="px-7 py-10">
@@ -198,7 +214,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Mobile Overlay */}
             {sidebarOpen && (
                 <div 
-                    className="fixed inset-0 z-40 bg-black/90 backdrop-blur-sm lg:hidden transition-opacity duration-500" 
+                    className="fixed inset-0 z-550 bg-black/90 backdrop-blur-sm lg:hidden transition-opacity duration-500" 
                     onClick={() => setSidebarOpen(false)} 
                 />
             )}
@@ -315,14 +331,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <UpgradeModal 
                     isOpen={showUpgradeModal} 
                     onClose={() => setShowUpgradeModal(false)}
-                    restaurantId={restaurant?.id || ''}
-                    currentPlan={restaurant?.is_premium ? 'premium' : 'free'}
                 />
+            )}
+
+            {/* Waiting Screen Overlay */}
+            {pendingRequest && (
+                <WaitingScreen pendingRequest={pendingRequest} />
             )}
 
             {/* Logout Modal */}
             {showLogoutModal && (
-                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-1100 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
                     <div className="bg-dark-2 border border-white/10 rounded-[40px] p-10 max-w-sm w-full shadow-2xl text-center animate-pop-in">
                         <div className="w-20 h-20 bg-saffron/10 rounded-[32px] flex items-center justify-center mx-auto mb-8">
                             <LogOut className="w-10 h-10 text-saffron" />
