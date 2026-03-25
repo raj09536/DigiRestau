@@ -253,11 +253,6 @@ export default function MenuPage() {
                 if (error) throw error;
                 setSuccessMsg(t('saved'));
             } else {
-                if (!restaurant?.is_premium && items.length >= 6) {
-                    setShowUpgradeModal(true);
-                    setSavingItem(false);
-                    return;
-                }
                 const { error } = await supabase.from('menu_items').insert(payload);
                 if (error) throw error;
                 setSuccessMsg(t('saved'));
@@ -336,20 +331,6 @@ export default function MenuPage() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    {!restaurant?.is_premium && (
-                        <div className="bg-dark-2 border border-white/10 rounded-2xl px-5 py-2.5 flex items-center gap-4 shadow-xl">
-                            <div className="text-right">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-text-muted">{t('free_limit')}</p>
-                                <p className={`text-sm font-bold ${items.length >= 6 ? 'text-red-500' : 'text-saffron'}`}>
-                                    {items.length}/6 {t('items_used')}
-                                </p>
-                            </div>
-                            <button onClick={() => setShowUpgradeModal(true)} className="p-2 bg-saffron/10 rounded-xl group hover:bg-saffron/20 transition-all">
-                                <Zap className="w-5 h-5 text-saffron fill-saffron group-hover:scale-110 transition-transform" />
-                            </button>
-                        </div>
-                    )}
-                    
                     <button
                         onClick={() => openItemModal()}
                         disabled={categories.length === 0}
@@ -441,9 +422,9 @@ export default function MenuPage() {
                 <div className="flex-1 space-y-6">
                     {!restaurant?.is_premium && (
                         <div className="inline-upgrade-hint">
-                            <span>⚡ Free plan: {items.length}/6 items used</span>
+                            <span>⚡ Support digiRestau – Unlock premium themes & icons</span>
                             <button onClick={() => setShowUpgradeModal(true)}>
-                                Upgrade for unlimited →
+                                Upgrade for Pro Themes →
                             </button>
                         </div>
                     )}

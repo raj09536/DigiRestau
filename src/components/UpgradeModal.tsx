@@ -8,9 +8,11 @@ import { useRestaurant } from '@/lib/restaurant-context';
 interface UpgradeModalProps {
     isOpen: boolean;
     onClose: () => void;
+    restaurantId?: string;
+    currentPlan?: string;
 }
 
-export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
+export default function UpgradeModal({ isOpen, onClose, restaurantId, currentPlan }: UpgradeModalProps) {
     const supabase = createClient();
     const { restaurant } = useRestaurant();
     const [view, setView] = useState<'info' | 'submit'>('info');
@@ -109,15 +111,44 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                             ✦ Upgrade to Pro
                         </h2>
 
-                        <div className="space-y-3.5">
-                            {features.map((feature, i) => (
-                                <div key={i} className="flex items-center gap-3 text-text-muted/90">
-                                    <div className="shrink-0 w-4 h-4 rounded-full bg-green-500/10 flex items-center justify-center">
-                                        <Check className="w-3 h-3 text-green-500" />
-                                    </div>
-                                    <span className="text-sm font-medium">{feature}</span>
+                        {/* Plan Comparison */}
+                        <div className="space-y-4">
+                            <div className="bg-white/5 rounded-2xl p-5 border border-white/5">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-4">Included in your FREE plan</p>
+                                <div className="grid grid-cols-1 gap-3">
+                                    {[
+                                        'Unlimited menu items',
+                                        'Unlimited tables',
+                                        'Real-time orders',
+                                        'QR codes',
+                                        'Image upload'
+                                    ].map((f, i) => (
+                                        <div key={i} className="flex items-center gap-2.5 text-text-muted/80">
+                                            <Check className="w-3.5 h-3.5 text-green-500" />
+                                            <span className="text-[13px] font-medium">{f}</span>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                            </div>
+
+                            <div className="bg-saffron/5 rounded-2xl p-5 border border-saffron/20">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-saffron mb-4">Unlock with PRO</p>
+                                <div className="grid grid-cols-1 gap-3">
+                                    {[
+                                        'Everything in Free',
+                                        'Custom themes & Colors',
+                                        'All future features — forever',
+                                        'Priority support'
+                                    ].map((f, i) => (
+                                        <div key={i} className="flex items-center gap-2.5 text-text-main">
+                                            <div className="shrink-0 w-4 h-4 rounded-full bg-saffron/20 flex items-center justify-center">
+                                                <Check className="w-3 h-3 text-saffron" />
+                                            </div>
+                                            <span className="text-[13px] font-bold">{f}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
 
                         <div className="pt-2">

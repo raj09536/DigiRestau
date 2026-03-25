@@ -187,7 +187,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 <div className="upgrade-box-icon">✦</div>
                                 <div className="upgrade-box-text flex-1">
                                     <strong>Upgrade to Pro</strong>
-                                    <span>Unlimited everything</span>
+                                    <span>Premium themes & icons</span>
                                 </div>
                                 <button className="text-saffron group-hover:translate-x-1 transition-transform">→</button>
                             </div>
@@ -260,7 +260,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <div className="flex items-center gap-4 pl-6 border-l border-white/10">
                             <div className="text-right hidden lg:block">
                                 <p className="text-xs font-black text-text-main uppercase tracking-wider">{restaurant?.name || 'Restaurant'}</p>
-                                <p className="text-[10px] font-bold text-saffron uppercase tracking-widest opacity-60">Verified Admin</p>
+                                <p className="text-[10px] font-bold text-saffron uppercase tracking-widest opacity-60">Restaurant Owner</p>
                             </div>
                             <div className="w-10 h-10 rounded-2xl bg-saffron flex items-center justify-center font-black text-white shadow-xl shadow-saffron/20 border-2 border-white/10 hover:scale-105 transition-transform cursor-pointer">
                                 {restaurant?.name?.[0]?.toUpperCase() || 'R'}
@@ -291,9 +291,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 <span className="text-gold">✦</span> You're on the Free Plan
                             </h4>
                             <p className="text-text-muted text-sm leading-relaxed mb-4">
-                                You've used {itemCount}/6 menu items. Upgrade to Pro and get unlimited items, tables, themes + all future features.
+                                Upgrade to Pro and unlock premium restaurant themes, custom colors, and all future features built for growing restaurants.
                             </p>
-                            <button onClick={() => { setShowNudgePopup(false); setShowUpgradeModal(true); }} className="nudge-cta">Upgrade Now →</button>
+                            <button onClick={() => { setShowNudgePopup(false); setShowUpgradeModal(true); }} className="nudge-cta">Unlock Themes →</button>
                             <button onClick={() => setShowNudgePopup(false)} className="nudge-dismiss">Maybe Later</button>
                         </div>
                     )}
@@ -304,7 +304,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 <span className="text-gold">🚀</span> Unlock Your Full Potential
                             </h4>
                             <p className="text-text-muted text-sm leading-relaxed mb-4">
-                                Free plan limits your growth. Pro users get unlimited everything and every new feature we build — forever.
+                                Support digiRestau and get early access to every new feature we build, plus premium branding tools for your restaurant.
                             </p>
                             <button onClick={() => { setShowNudgePopup(false); setShowUpgradeModal(true); }} className="nudge-cta">Get Pro for ₹499/mo →</button>
                             <button onClick={() => setShowNudgePopup(false)} className="nudge-dismiss">Dismiss</button>

@@ -42,11 +42,7 @@ export default function TablesPage() {
     const addTable = async () => {
         if (!restaurant) return;
 
-        // Check free plan limit
-        if (!restaurant.is_premium && tables.length >= 3) {
-            setShowUpgradeModal(true);
-            return;
-        }
+        // No more free plan limit
 
         setAdding(true);
         const nextNumber = tables.length > 0
@@ -143,9 +139,9 @@ export default function TablesPage() {
                     <div className="flex items-center gap-4">
                         {!restaurant?.is_premium && (
                             <div className="inline-upgrade-hint">
-                                <span>⚡ Free plan: {tables.length}/3 tables used</span>
+                                <span>⚡ Support digiRestau – Unlock premium themes</span>
                                 <button onClick={() => setShowUpgradeModal(true)}>
-                                    Upgrade for unlimited →
+                                    Upgrade to Pro →
                                 </button>
                             </div>
                         )}

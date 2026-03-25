@@ -15,22 +15,27 @@ export default function LoginPage() {
     const router = useRouter();
     const supabase = createClient();
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
+    const handleLogin = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
         setLoading(true);
-        try {
-            const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
-            if (authError) {
-                setError(authError.message);
-                return;
-            }
-            router.push('/dashboard');
-        } catch {
-            setError('Something went wrong. Try again.');
-        } finally {
+        setError('');
+
+        // Step 1: Login
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+        if (error) {
+            setError('Invalid email or password');
             setLoading(false);
+            return;
         }
+
+        // Step 2: Redirect to dashboard
+        router.push('/dashboard');
+
+        setLoading(false);
     };
 
     return (
@@ -77,7 +82,7 @@ export default function LoginPage() {
                     )}
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleLogin} className="space-y-6">
                         <div className="space-y-2">
                             <label className="auth-label">Email Address</label>
                             <input
@@ -110,6 +115,14 @@ export default function LoginPage() {
                                     placeholder="••••••••"
                                     required
                                 />
+                            </div>
+                            <div className="text-right mt-1.5">
+                                <Link 
+                                    href="/forgot-password"
+                                    className="text-[13px] font-medium text-text-muted hover:text-saffron transition-colors"
+                                >
+                                    Forgot Password?
+                                </Link>
                             </div>
                         </div>
 

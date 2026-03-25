@@ -393,13 +393,14 @@ export default function LandingPage() {
 
               <ul className="space-y-5 mb-12 flex-1 text-left plan-features">
                 {[
-                  { label: '6 menu items', check: true },
-                  { label: '3 tables', check: true },
+                  { label: 'Unlimited menu items', check: true },
+                  { label: 'Unlimited tables', check: true },
                   { label: 'Real-time orders', check: true },
                   { label: 'QR codes', check: true },
+                  { label: 'Image upload', check: true },
                   { label: 'Custom themes', check: false },
-                  { label: 'Image upload', check: false },
                   { label: 'Future features', check: false },
+                  { label: 'Priority Support', check: false },
                 ].map((item, i) => (
                   <li key={i} className={!item.check ? 'unavailable' : ''}>
                     {item.check ? <Check className="feat-check" /> : <X className="feat-cross" />}
