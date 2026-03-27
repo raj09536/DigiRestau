@@ -12,6 +12,7 @@ import {
     ArrowRight,
     Search,
 } from 'lucide-react';
+import { getTimeAgo } from '@/lib/utils';
 import type { Order } from '@/lib/types';
 
 export default function DashboardPage() {
@@ -94,10 +95,6 @@ export default function DashboardPage() {
         }
     };
 
-    const formatTime = (dateStr: string) => {
-        const date = new Date(dateStr);
-        return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-    };
 
     return (
         <div className="space-y-10">
@@ -194,7 +191,7 @@ export default function DashboardPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-text-muted text-sm group-hover:text-text-main transition-colors">
-                                            {formatTime(order.created_at)}
+                                            {getTimeAgo(order.created_at)}
                                         </td>
                                     </tr>
                                 ))

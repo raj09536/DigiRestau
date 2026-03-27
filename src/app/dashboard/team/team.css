@@ -1,0 +1,436 @@
+.restaurant-id-box {
+  background: rgba(244,98,42,0.08);
+  border: 1px solid rgba(244,98,42,0.2);
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: #A89080;
+}
+
+.restaurant-id-box strong {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  color: #F4622A;
+  letter-spacing: 0.1em;
+}
+
+.staff-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.staff-card {
+  background: #1E1510;
+  border: 1px solid rgba(244,98,42,0.15);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.staff-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(244,98,42,0.4);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.staff-avatar {
+  width: 56px; height: 56px;
+  background: rgba(244,98,42,0.1);
+  border: 2px solid rgba(244,98,42,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 800;
+  color: #F4622A;
+  flex-shrink: 0;
+}
+
+.staff-info h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  color: #F5EDE8;
+  margin-bottom: 6px;
+}
+
+.role-badge {
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 100px;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.role-badge.chef { background: rgba(232,184,75,0.12); color: #E8B84B; }
+.role-badge.waiter { background: rgba(76,175,125,0.12); color: #4CAF7D; }
+.role-badge.manager { background: rgba(244,98,42,0.12); color: #F4622A; }
+
+.staff-info p {
+    font-size: 13px;
+    color: #A89080;
+    margin-bottom: 4px;
+}
+
+.staff-actions {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.staff-actions button {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #A89080;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.staff-actions button:hover {
+    background: rgba(255,255,255,0.08);
+    color: #F5EDE8;
+}
+
+.staff-actions button.delete-btn:hover {
+    background: rgba(255,87,87,0.1);
+    color: #FF8A8A;
+    border-color: rgba(255,87,87,0.2);
+}
+
+.attendance-row {
+  background: #1E1510;
+  border: 1px solid rgba(244,98,42,0.15);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.staff-name-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.staff-name-info span:first-child {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.role-tag {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #A89080;
+}
+
+.shift-tag {
+  font-size: 10px;
+  color: #6a4d3b;
+  font-weight: 800;
+}
+
+.attendance-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.att-btn {
+  padding: 8px 18px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.02);
+  color: #A89080;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.att-btn:hover {
+    background: rgba(255,255,255,0.05);
+    color: #F5EDE8;
+}
+
+.att-btn.selected.present { background: rgba(76,175,125,0.15); border-color: rgba(76,175,125,0.4); color: #4CAF7D; }
+.att-btn.selected.absent { background: rgba(255,87,87,0.15); border-color: rgba(255,87,87,0.4); color: #FF8A8A; }
+.att-btn.selected.late { background: rgba(232,184,75,0.15); border-color: rgba(232,184,75,0.4); color: #E8B84B; }
+.att-btn.selected.leave { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.4); color: #3B82F6; }
+
+.overtime-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #A89080;
+}
+
+.overtime-input input {
+  width: 60px;
+  background: #2C1F17;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 4px 10px;
+  color: #F5EDE8;
+  font-weight: 700;
+}
+
+.salary-card {
+  background: #1E1510;
+  border: 1px solid rgba(244,98,42,0.15);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.salary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed rgba(255,255,255,0.1);
+}
+
+.salary-header h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+}
+
+.salary-breakdown {
+  margin: 20px 0;
+  background: rgba(0,0,0,0.2);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.salary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 14px;
+  color: #A89080;
+}
+
+.salary-row span:last-child {
+    font-weight: 700;
+    color: #F5EDE8;
+}
+
+.salary-row.total {
+  border-bottom: none;
+  font-weight: 900;
+  font-size: 18px;
+  color: #F5EDE8;
+  padding-top: 16px;
+}
+
+.salary-row.total span:last-child {
+    color: #F4622A;
+    font-size: 22px;
+}
+
+.salary-row.bonus input {
+  width: 90px;
+  background: #1E1510;
+  border: 1px solid rgba(244,98,42,0.3);
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: #F5EDE8;
+  text-align: right;
+  font-weight: 800;
+}
+
+.payment-section {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.payment-toggle {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.payment-toggle button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.02);
+  color: #A89080;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.payment-toggle button.active {
+  background: rgba(244,98,42,0.15);
+  border-color: #F4622A;
+  color: #F4622A;
+}
+
+.mark-paid-btn {
+  width: 100%;
+  padding: 16px;
+  background: rgba(76,175,125,0.1);
+  border: 1px solid rgba(76,175,125,0.3);
+  color: #4CAF7D;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+
+.mark-paid-btn:hover {
+    background: #4CAF7D;
+    color: white;
+}
+
+.advance-btn {
+  width: 100%;
+  padding: 12px;
+  background: rgba(232,184,75,0.05);
+  border: 1px solid rgba(232,184,75,0.2);
+  color: #E8B84B;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+}
+
+.screenshot-upload {
+    margin: 16px 0;
+}
+
+.screenshot-upload label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  background: rgba(192, 132, 252, 0.05);
+  border: 1px dashed rgba(192, 132, 252, 0.3);
+  border-radius: 14px;
+  color: #C084FC;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.assignment-card {
+  background: #1E1510;
+  border: 1px solid rgba(244,98,42,0.15);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.assignment-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.assigned-tables {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.table-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(244,98,42,0.1);
+  border: 1px solid rgba(244,98,42,0.3);
+  color: #F5EDE8;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.table-chip button {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  color: #F5EDE8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  transition: all 0.2s;
+}
+
+.table-chip button:hover {
+  background: #FF5757;
+  color: white;
+}
+
+.paid-badge {
+  background: rgba(76,175,125,0.12);
+  border: 1px solid rgba(76,175,125,0.3);
+  color: #4CAF7D;
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.paid-info {
+    text-align: center;
+    padding: 20px;
+    background: rgba(76, 175, 125, 0.05);
+    border-radius: 16px;
+    color: #4CAF7D;
+    font-weight: 800;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.paid-info span {
+    display: block;
+    font-size: 10px;
+    opacity: 0.6;
+    margin-top: 4px;
+}

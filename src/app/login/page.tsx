@@ -147,11 +147,17 @@ export default function LoginPage() {
                                 Start for free →
                             </Link>
                         </p>
-                        <div className="flex items-center justify-center gap-4 text-[10px] font-bold text-text-muted/40 uppercase tracking-widest">
+                        <div className="flex items-center justify-center gap-4 text-[10px] font-bold text-text-muted/40 uppercase tracking-widest mb-6">
                             <span className="flex items-center gap-1.5"><Check className="w-3 h-3" /> Secure Access</span>
                             <span>•</span>
                             <span>256-bit SSL</span>
                         </div>
+                        <Link 
+                            href="/staff-login"
+                            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/5 hover:border-saffron/20 hover:bg-saffron/5 text-[11px] font-black uppercase tracking-widest text-text-muted hover:text-saffron transition-all"
+                        >
+                            👨‍🍳 Staff Login
+                        </Link>
                     </div>
                 </div>
             </div>

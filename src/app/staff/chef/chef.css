@@ -1,0 +1,232 @@
+.chef-container {
+  min-height: 100vh;
+  background: #0A0705;
+  color: #F5EDE8;
+  padding-top: 80px; /* Space for fixed header */
+  padding-bottom: 40px;
+}
+
+.chef-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: rgba(18, 13, 10, 0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1000;
+}
+
+.chef-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.restaurant-name {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  color: #F4622A;
+  font-weight: 800;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.logout-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #A89080;
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 87, 87, 0.1);
+  border-color: rgba(255, 87, 87, 0.3);
+  color: #FF8A8A;
+}
+
+.kitchen-section {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.kitchen-title-area {
+  margin-bottom: 24px;
+}
+
+.kitchen-title {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  color: #F5EDE8;
+  margin-bottom: 4px;
+}
+
+.kitchen-subtitle {
+  color: #A89080;
+  font-size: 14px;
+}
+
+.kitchen-card {
+  background: #1E1510;
+  border: 1px solid rgba(244,98,42,0.2);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 14px;
+  transition: transform 0.2s;
+}
+
+.kitchen-card:active {
+  transform: scale(0.98);
+}
+
+.kitchen-card.accepted {
+  border-color: rgba(244,98,42,0.5);
+  background: rgba(244,98,42,0.05);
+}
+
+.kitchen-card.preparing {
+  border-color: rgba(232,184,75,0.5);
+  background: rgba(232,184,75,0.05);
+}
+
+.kitchen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.table-name {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #F5EDE8;
+}
+
+.order-time {
+  font-size: 12px;
+  color: #A89080;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge.accepted {
+  background: rgba(244,98,42,0.15);
+  color: #F4622A;
+  border: 1px solid rgba(244,98,42,0.2);
+}
+
+.status-badge.preparing {
+  background: rgba(232,184,75,0.15);
+  color: #E8B84B;
+  border: 1px solid rgba(232,184,75,0.2);
+}
+
+.kitchen-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #2C1F17;
+  border-radius: 10px;
+}
+
+.kitchen-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.item-qty {
+  background: rgba(244,98,42,0.15);
+  color: #F4622A;
+  padding: 2px 10px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.item-name {
+  color: #F5EDE8;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.start-btn {
+  width: 100%;
+  padding: 14px;
+  background: rgba(244,98,42,0.15);
+  border: 1px solid rgba(244,98,42,0.3);
+  color: #F4622A;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.start-btn:hover {
+  background: #F4622A;
+  color: white;
+}
+
+.ready-btn {
+  width: 100%;
+  padding: 14px;
+  background: rgba(76,175,125,0.15);
+  border: 1px solid rgba(76,175,125,0.3);
+  color: #4CAF7D;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ready-btn:hover {
+  background: #4CAF7D;
+  color: white;
+}
+
+.no-orders {
+  text-align: center;
+  padding: 60px 20px;
+  background: #1E1510;
+  border-radius: 24px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.no-orders-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.no-orders-text {
+  color: #A89080;
+  font-size: 16px;
+}

@@ -1,0 +1,164 @@
+.staff-login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0A0705;
+  padding: 20px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.staff-login-card {
+  width: 100%;
+  max-width: 420px;
+  background: #1E1510;
+  border: 1px solid rgba(244,98,42,0.3);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.staff-login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.staff-login-icon {
+  font-size: 48px;
+  color: #F4622A;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.staff-login-title {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  color: #F5EDE8;
+  margin-bottom: 8px;
+}
+
+.staff-login-subtitle {
+  color: #A89080;
+  font-size: 14px;
+}
+
+.staff-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.staff-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.staff-input-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #A89080;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.staff-input {
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: #F5EDE8;
+  font-size: 15px;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.staff-input:focus {
+  border-color: rgba(244,98,42,0.5);
+  background: rgba(244,98,42,0.03);
+}
+
+.staff-login-btn {
+  width: 100%;
+  background: #F4622A;
+  color: white;
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  box-shadow: 0 10px 25px rgba(244, 98, 42, 0.2);
+}
+
+.staff-login-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(244, 98, 42, 0.4);
+  background: #ff753e;
+}
+
+.staff-login-btn:active {
+  transform: translateY(0);
+}
+
+.staff-login-error {
+  background: rgba(255, 87, 87, 0.1);
+  border: 1px solid rgba(255, 87, 87, 0.3);
+  color: #FF8A8A;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.password-container {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #A89080;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:hover {
+  color: #F5EDE8;
+}
+
+.staff-login-footer {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.back-to-login {
+  color: #6a4d3b;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.back-to-login:hover {
+  color: #A89080;
+}

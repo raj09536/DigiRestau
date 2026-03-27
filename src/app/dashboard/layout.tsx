@@ -16,10 +16,13 @@ import {
     X,
     Star,
     Crown,
+    MessageSquare,
+    Package,
+    Lock,
+    Users,
 } from 'lucide-react';
 
 import UpgradeModal from '@/components/UpgradeModal';
-import WaitingScreen from '@/components/WaitingScreen';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -33,7 +36,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const router = useRouter();
     const supabase = createClient();
     const { restaurant, setRestaurant } = useRestaurant();
-    const [pendingRequest, setPendingRequest] = useState<any>(null);
 
     useEffect(() => {
         const fetchRestaurantAndData = async () => {
@@ -62,41 +64,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         fetchRestaurantAndData();
     }, []);
 
-    useEffect(() => {
-        const checkPending = async () => {
-            if (!restaurant) return;
-            const { data } = await supabase
-                .from('subscription_requests')
-                .select('*')
-                .eq('restaurant_id', restaurant.id)
-                .eq('status', 'pending')
-                .maybeSingle();
-            setPendingRequest(data);
-        };
-        checkPending();
-    }, [restaurant]);
 
-    // 5-Minute Upgrade Popup for Free Users
-    useEffect(() => {
-        if (!restaurant || restaurant.is_premium) return;
-
-        // Show first popup after 2 minutes
-        const firstTimer = setTimeout(() => {
-            setNudgeMessageIndex(Math.floor(Math.random() * 3));
-            setShowNudgePopup(true);
-        }, 2 * 60 * 1000);
-
-        // Then every 5 minutes
-        const interval = setInterval(() => {
-            setNudgeMessageIndex(Math.floor(Math.random() * 3));
-            setShowNudgePopup(true);
-        }, 5 * 60 * 1000);
-
-        return () => {
-            clearTimeout(firstTimer);
-            clearInterval(interval);
-        };
-    }, [restaurant]);
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
@@ -108,6 +76,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { href: '/dashboard/orders', label: 'Live Orders', icon: ShoppingBag, badge: true },
         { href: '/dashboard/menu', label: 'Menu', icon: UtensilsCrossed },
         { href: '/dashboard/tables', label: 'Tables', icon: Grid3X3 },
+        { href: '/dashboard/feedback', label: 'Feedback', icon: MessageSquare },
+        { href: '/dashboard/inventory', label: 'Inventory', icon: Package, isPremium: true },
+        { href: '/dashboard/team', label: 'Team', icon: Users, isPremium: true },
         { href: '/dashboard/settings', label: 'Settings', icon: Settings },
     ];
 
@@ -194,9 +165,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         )}
 
                         <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center gap-2 group cursor-default">
-                            <Star className={`w-4 h-4 ${restaurant?.is_premium ? 'text-gold fill-gold' : 'text-text-muted opacity-30'}`} />
-                            <span className={`text-[10px] font-black uppercase tracking-widest ${restaurant?.is_premium ? 'text-text-main' : 'text-text-muted'}`}>
-                                {restaurant?.is_premium ? 'Pro Member' : 'Free Account'}
+                            <Star className="w-4 h-4 text-text-muted opacity-30" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-text-muted">
+                                Free Account
                             </span>
                         </div>
 
@@ -275,56 +246,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </main>
             </div>
 
-            {/* Nudge Popup */}
-            {showNudgePopup && (
-                <div className="nudge-popup">
-                    <button 
-                        onClick={() => setShowNudgePopup(false)}
-                        className="absolute top-4 right-4 text-text-muted hover:text-text-main"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
-                    
-                    {nudgeMessageIndex === 0 && (
-                        <div className="pr-4">
-                            <h4 className="text-text-main font-bold flex items-center gap-2 mb-2">
-                                <span className="text-gold">✦</span> You're on the Free Plan
-                            </h4>
-                            <p className="text-text-muted text-sm leading-relaxed mb-4">
-                                Upgrade to Pro and unlock premium restaurant themes, custom colors, and all future features built for growing restaurants.
-                            </p>
-                            <button onClick={() => { setShowNudgePopup(false); setShowUpgradeModal(true); }} className="nudge-cta">Unlock Themes →</button>
-                            <button onClick={() => setShowNudgePopup(false)} className="nudge-dismiss">Maybe Later</button>
-                        </div>
-                    )}
-
-                    {nudgeMessageIndex === 1 && (
-                        <div className="pr-4">
-                            <h4 className="text-text-main font-bold flex items-center gap-2 mb-2">
-                                <span className="text-gold">🚀</span> Unlock Your Full Potential
-                            </h4>
-                            <p className="text-text-muted text-sm leading-relaxed mb-4">
-                                Support digiRestau and get early access to every new feature we build, plus premium branding tools for your restaurant.
-                            </p>
-                            <button onClick={() => { setShowNudgePopup(false); setShowUpgradeModal(true); }} className="nudge-cta">Get Pro for ₹499/mo →</button>
-                            <button onClick={() => setShowNudgePopup(false)} className="nudge-dismiss">Dismiss</button>
-                        </div>
-                    )}
-
-                    {nudgeMessageIndex === 2 && (
-                        <div className="pr-4">
-                            <h4 className="text-text-main font-bold flex items-center gap-2 mb-2">
-                                <span className="text-gold">⏰</span> Limited Launch Offer
-                            </h4>
-                            <p className="text-text-muted text-sm leading-relaxed mb-4">
-                                First 20 restaurants get Pro at ₹499/mo forever. Only a few spots left.
-                            </p>
-                            <button onClick={() => { setShowNudgePopup(false); setShowUpgradeModal(true); }} className="nudge-cta">Claim Your Spot →</button>
-                            <button onClick={() => setShowNudgePopup(false)} className="nudge-dismiss">Not Now</button>
-                        </div>
-                    )}
-                </div>
-            )}
 
             {/* Upgrade Modal */}
             {showUpgradeModal && (
@@ -334,10 +255,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 />
             )}
 
-            {/* Waiting Screen Overlay */}
-            {pendingRequest && (
-                <WaitingScreen pendingRequest={pendingRequest} />
-            )}
 
             {/* Logout Modal */}
             {showLogoutModal && (

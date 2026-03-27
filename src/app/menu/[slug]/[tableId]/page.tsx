@@ -18,6 +18,7 @@ import {
     ArrowLeft,
     User,
     ShoppingCart,
+    AlertTriangle,
 } from 'lucide-react';
 
 const statusSteps: { key: OrderStatus; label: string; icon: any }[] = [
@@ -51,6 +52,16 @@ export default function CustomerMenuPage({
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [cancelling, setCancelling] = useState(false);
+    const [cancelTimeLimit, setCancelTimeLimit] = useState(2);
+    const [timeLeft, setTimeLeft] = useState(0);
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    const [thankYouMessage, setThankYouMessage] = useState<string | null>(null);
+    
+    // Feedback state
+    const [rating, setRating] = useState(0);
+    const [comment, setComment] = useState('');
+    const [submitted, setSubmitted] = useState(false);
+    const [feedbackLoading, setFeedbackLoading] = useState(false);
 
     const supabase = createClient();
     const categoryRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
@@ -59,7 +70,7 @@ export default function CustomerMenuPage({
         try {
             const { data: restaurant, error: restError } = await supabase
                 .from('restaurants')
-                .select('id, name, logo_url')
+                .select('id, name, logo_url, cancel_time_limit, thank_you_message')
                 .eq('slug', slug)
                 .eq('is_active', true)
                 .single();
@@ -73,6 +84,8 @@ export default function CustomerMenuPage({
             setRestaurantId(restaurant.id);
             setRestaurantName(restaurant.name);
             setRestaurantLogo(restaurant.logo_url);
+            setCancelTimeLimit(restaurant.cancel_time_limit ?? 2);
+            setThankYouMessage(restaurant.thank_you_message);
 
             const { data: tableData } = await supabase
                 .from('tables')
@@ -133,6 +146,57 @@ export default function CustomerMenuPage({
             supabase.removeChannel(channel);
         };
     }, [currentOrder?.id, supabase]);
+
+    // Check if feedback already exists
+    useEffect(() => {
+        const checkFeedback = async () => {
+            if (!currentOrder || currentOrder.status !== 'ready') return;
+            const { data } = await supabase
+                .from('order_feedback')
+                .select('id')
+                .eq('order_id', currentOrder.id)
+                .maybeSingle();
+            if (data) setSubmitted(true);
+        };
+        checkFeedback();
+    }, [currentOrder?.id, currentOrder?.status, supabase]);
+
+    // Countdown logic
+    const getRemainingSeconds = useCallback(() => {
+        if (!currentOrder || cancelTimeLimit === 0) return 0;
+        const orderTime = new Date(currentOrder.created_at + 'Z').getTime();
+        const now = new Date().getTime();
+        const secondsPassed = (now - orderTime) / 1000;
+        const limitSeconds = cancelTimeLimit * 60;
+        return Math.max(0, limitSeconds - secondsPassed);
+    }, [currentOrder, cancelTimeLimit]);
+
+    useEffect(() => {
+        if (!currentOrder || currentOrder.status !== 'pending' || cancelTimeLimit === 0) {
+            setTimeLeft(0);
+            return;
+        }
+
+        const initial = getRemainingSeconds();
+        setTimeLeft(initial);
+        if (initial <= 0) return;
+
+        const timer = setInterval(() => {
+            const remaining = getRemainingSeconds();
+            setTimeLeft(remaining);
+            if (remaining <= 0) {
+                clearInterval(timer);
+            }
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [currentOrder?.id, currentOrder?.status, cancelTimeLimit, getRemainingSeconds]);
+
+    const canCancel = () => {
+        if (!currentOrder || currentOrder.status !== 'pending') return false;
+        if (cancelTimeLimit === 0) return false;
+        return getRemainingSeconds() > 0;
+    };
 
     const addToCart = (item: MenuItem) => {
         if (!item.is_available) return;
@@ -207,7 +271,10 @@ export default function CustomerMenuPage({
 
     const cancelOrder = async () => {
         if (!currentOrder || currentOrder.status !== 'pending') return;
-        if (!confirm('Are you sure you want to cancel your order?')) return;
+        if (!canCancel()) {
+            alert('Cancel window has closed.');
+            return;
+        }
         setCancelling(true);
 
         try {
@@ -218,10 +285,32 @@ export default function CustomerMenuPage({
 
             if (error) throw error;
             setCurrentOrder((prev) => prev ? { ...prev, status: 'cancelled' as OrderStatus } : null);
+            setShowCancelConfirm(false);
         } catch (err) {
             console.error('Error cancelling order:', err);
         } finally {
             setCancelling(false);
+        }
+    };
+
+    const handleSubmitFeedback = async () => {
+        if (!currentOrder || rating === 0) return;
+        setFeedbackLoading(true);
+        try {
+            const { error } = await supabase
+                .from('order_feedback')
+                .insert({
+                    order_id: currentOrder.id,
+                    restaurant_id: restaurantId,
+                    rating: rating,
+                    comment: comment.trim() || null
+                });
+            if (error) throw error;
+            setSubmitted(true);
+        } catch (err) {
+            console.error('Error submitting feedback:', err);
+        } finally {
+            setFeedbackLoading(false);
         }
     };
 
@@ -331,9 +420,120 @@ export default function CustomerMenuPage({
                         </div>
 
                         {currentOrder.status === 'pending' && (
-                            <button onClick={cancelOrder} className="text-red-400 font-bold text-sm bg-red-400/5 px-6 py-3 rounded-xl border border-red-400/10 hover:bg-red-400 hover:text-white transition-all">
-                                {cancelling ? 'Cancelling...' : 'Cancel Order'}
-                            </button>
+                            <div className="w-full max-w-sm mx-auto bg-dark-2/50 border border-white/5 rounded-[24px] p-5 shadow-inner">
+                                {cancelTimeLimit === 0 ? (
+                                    <div className="flex items-center justify-center gap-3 text-text-muted opacity-60">
+                                        <XCircle className="w-5 h-5 text-red-500/50" />
+                                        <p className="text-xs font-medium">Orders cannot be cancelled here</p>
+                                    </div>
+                                ) : timeLeft > 0 ? (
+                                    <div className="space-y-4">
+                                        <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                                            <div 
+                                                className={`h-full transition-all duration-1000 ease-linear ${timeLeft < 15 ? 'bg-red-500' : 'bg-saffron'}`}
+                                                style={{ width: `${(timeLeft / (cancelTimeLimit * 60)) * 100}%` }}
+                                            />
+                                        </div>
+                                        <p className="text-[11px] font-black uppercase tracking-widest text-text-muted animate-pulse">
+                                            ⏱ <span className="text-text-main">{Math.ceil(timeLeft)}s</span> left to cancel
+                                        </p>
+                                        <button 
+                                            onClick={() => setShowCancelConfirm(true)} 
+                                            className="w-full py-3.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl font-bold text-xs transition-all tracking-wide"
+                                        >
+                                            Cancel Order
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-center gap-3 text-text-muted opacity-60">
+                                        <Clock className="w-5 h-5" />
+                                        <p className="text-xs font-medium">Cancellation window closed</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Feedback Section */}
+                        {currentOrder.status === 'ready' && (
+                            <div className="feedback-section mt-10 animate-fade-in text-left">
+                                {/* Payment Instruction */}
+                                <div className="payment-box">
+                                    <span style={{ fontSize: '24px' }}>💵</span>
+                                    <div>
+                                        <strong>Counter Par Payment Karein</strong>
+                                        <p>Khana enjoy karne ke baad counter par payment karein</p>
+                                    </div>
+                                </div>
+
+                                {/* Divider */}
+                                <div className="divider">
+                                    <span>Aapka feedback</span>
+                                </div>
+
+                                {!submitted ? (
+                                    <>
+                                        {/* Star Rating */}
+                                        <div className="rating-section mb-6">
+                                            <p className="rating-title mb-4">Khana kaisa laga? ⭐</p>
+                                            <div className="stars flex justify-center gap-2">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <button
+                                                        key={star}
+                                                        className={`star-btn text-4xl ${rating >= star ? 'active text-saffron' : 'text-white/10'}`}
+                                                        onClick={() => setRating(star)}
+                                                    >
+                                                        ★
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            {rating > 0 && (
+                                                <p className="rating-label text-center mt-3 font-bold text-saffron">
+                                                    {rating === 1 && '😞 Bahut Bura'}
+                                                    {rating === 2 && '😕 Theek Nahi'}
+                                                    {rating === 3 && '😊 Theek Tha'}
+                                                    {rating === 4 && '😄 Achha Tha'}
+                                                    {rating === 5 && '🤩 Bahut Achha!'}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {/* Comment */}
+                                        <textarea
+                                            className="feedback-input w-full bg-dark border border-white/5 rounded-2xl p-4 text-white text-sm outline-none focus:border-saffron/30 transition-all"
+                                            placeholder="Koi suggestion ya comment? (optional)"
+                                            value={comment}
+                                            onChange={(e) => setComment(e.target.value)}
+                                            rows={3}
+                                        />
+
+                                        {/* Submit */}
+                                        <button
+                                            className="submit-feedback-btn w-full mt-6 py-4 bg-saffron text-white rounded-full font-bold shadow-lg shadow-saffron/20 disabled:opacity-50"
+                                            onClick={handleSubmitFeedback}
+                                            disabled={rating === 0 || feedbackLoading}
+                                        >
+                                            {feedbackLoading ? 'Submitting...' : rating === 0 ? 'Pehle Rating Do ⭐' : 'Feedback Submit Karo →'}
+                                        </button>
+
+                                        {/* Skip */}
+                                        <button
+                                            className="skip-btn w-full mt-4 text-text-muted hover:text-white transition-colors"
+                                            onClick={() => setSubmitted(true)}
+                                        >
+                                            Skip karo
+                                        </button>
+                                    </>
+                                ) : (
+                                    /* Thank You Screen */
+                                    <div className="thankyou-screen text-center py-6 animate-pop-in">
+                                        <div className="thankyou-icon text-5xl mb-4">🙏</div>
+                                        <h3 className="thankyou-title text-2xl font-fraunces text-white mb-2 tracking-tight">Shukriya!</h3>
+                                        <p className="thankyou-message text-text-muted">
+                                            {thankYouMessage || 'Khana enjoy kiya? Dobara aana! Aur payment counter par karein. 🙏'}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
                         )}
                     </div>
                 ) : (
@@ -354,6 +554,38 @@ export default function CustomerMenuPage({
                         <button onClick={() => setCurrentOrder(null)} className="w-full py-4 bg-saffron text-white rounded-2xl font-black text-lg shadow-xl shadow-saffron/20 transition-all hover:scale-[1.02] active:scale-95">
                             Place Another Order
                         </button>
+                    </div>
+                )}
+
+                {/* Cancel Confirmation Modal */}
+                {showCancelConfirm && (
+                    <div className="fixed inset-0 z-60 flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
+                        <div className="relative w-full max-w-sm bg-dark-2 border border-white/10 rounded-[32px] p-8 shadow-2xl animate-pop-in text-center">
+                            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <AlertTriangle className="w-8 h-8 text-red-500" />
+                            </div>
+                            <h3 className="text-2xl font-fraunces text-white mb-2">Cancel Order?</h3>
+                            <p className="text-text-muted text-sm leading-relaxed mb-8">
+                                This action cannot be undone. Are you sure you want to cancel this order?
+                            </p>
+
+                            <div className="flex flex-col gap-3">
+                                <button
+                                    onClick={cancelOrder}
+                                    disabled={cancelling}
+                                    className="w-full py-4 bg-red-500 text-white rounded-xl font-black text-sm uppercase tracking-widest shadow-lg shadow-red-500/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                                >
+                                    {cancelling ? 'Processing...' : 'Yes, Cancel Now'}
+                                </button>
+
+                                <button 
+                                    onClick={() => setShowCancelConfirm(false)} 
+                                    className="w-full py-4 text-text-muted font-bold text-sm hover:text-white transition-colors"
+                                >
+                                    No, Keep It
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>

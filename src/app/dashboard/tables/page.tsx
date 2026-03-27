@@ -113,8 +113,6 @@ export default function TablesPage() {
             <UpgradeModal 
                 isOpen={showUpgradeModal} 
                 onClose={() => setShowUpgradeModal(false)}
-                restaurantId={restaurant?.id || ''}
-                currentPlan={restaurant?.is_premium ? 'premium' : 'free'}
             />
 
             {/* Header */}
@@ -137,14 +135,6 @@ export default function TablesPage() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        {!restaurant?.is_premium && (
-                            <div className="inline-upgrade-hint">
-                                <span>⚡ Support digiRestau – Unlock premium themes</span>
-                                <button onClick={() => setShowUpgradeModal(true)}>
-                                    Upgrade to Pro →
-                                </button>
-                            </div>
-                        )}
                         
                         <button
                             onClick={addTable}

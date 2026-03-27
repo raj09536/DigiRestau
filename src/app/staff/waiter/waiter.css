@@ -1,0 +1,224 @@
+.waiter-container {
+  min-height: 100vh;
+  background: #0A0705;
+  color: #F5EDE8;
+  padding-top: 80px;
+  padding-bottom: 40px;
+}
+
+.waiter-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: rgba(18, 13, 10, 0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1000;
+}
+
+.waiter-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.restaurant-name {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  color: #F4622A;
+  font-weight: 800;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.logout-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #A89080;
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.waiter-section {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.waiter-title {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  margin-bottom: 24px;
+}
+
+.waiter-tables-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.waiter-table {
+  background: #1E1510;
+  border: 1px solid rgba(244,98,42,0.15);
+  border-radius: 18px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.waiter-table:active {
+  transform: scale(0.95);
+}
+
+.waiter-table.active {
+  border-color: rgba(244,98,42,0.5);
+  background: rgba(244,98,42,0.06);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.waiter-table.selected {
+  border-color: #F4622A;
+  background: rgba(244,98,42,0.1);
+}
+
+.waiter-table.free {
+  border-color: rgba(76,175,125,0.2);
+}
+
+.table-icon {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.table-name {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #F5EDE8;
+}
+
+.table-status {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 100px;
+}
+
+.table-status.busy {
+  background: rgba(255, 87, 87, 0.1);
+  color: #FF5757;
+}
+
+.table-status.free {
+  background: rgba(76, 175, 125, 0.1);
+  color: #4CAF7D;
+}
+
+.order-items-count {
+  font-size: 10px;
+  color: #A89080;
+  background: rgba(255,255,255,0.05);
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+.table-orders {
+  background: #1E1510;
+  border-radius: 24px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  animation: slide-up 0.4s ease-out;
+}
+
+.table-orders h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: #F4622A;
+}
+
+.waiter-order-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.order-customer {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 14px;
+  color: #F5EDE8;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(255,255,255,0.1);
+}
+
+.order-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.order-item-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #A89080;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.order-total {
+  font-weight: 800;
+  font-size: 16px;
+  color: #F4622A;
+}
+
+.order-status {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.order-status.pending { background: rgba(232,184,75,0.1); color: #E8B84B; }
+.order-status.preparing { background: rgba(244,98,42,0.1); color: #F4622A; }
+.order-status.ready { background: rgba(76,175,125,0.1); color: #4CAF7D; }
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

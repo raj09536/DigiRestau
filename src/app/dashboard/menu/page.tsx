@@ -342,12 +342,6 @@ export default function MenuPage() {
                 </div>
             </div>
 
-            <UpgradeModal 
-                isOpen={showUpgradeModal} 
-                onClose={() => setShowUpgradeModal(false)}
-                restaurantId={restaurant?.id || ''}
-                currentPlan={restaurant?.is_premium ? 'premium' : 'free'}
-            />
 
             {/* Main Content Area */}
             <div className="flex flex-col lg:flex-row gap-8">
@@ -420,14 +414,6 @@ export default function MenuPage() {
 
                 {/* Items Grid */}
                 <div className="flex-1 space-y-6">
-                    {!restaurant?.is_premium && (
-                        <div className="inline-upgrade-hint">
-                            <span>⚡ Support digiRestau – Unlock premium themes & icons</span>
-                            <button onClick={() => setShowUpgradeModal(true)}>
-                                Upgrade for Pro Themes →
-                            </button>
-                        </div>
-                    )}
 
                     {/* Search & Actions */}
                     <div className="flex flex-col sm:flex-row gap-4">

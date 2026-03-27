@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase';
 import { useRestaurant } from '@/lib/restaurant-context';
-import { Loader2, Check, Store, ImageIcon, Upload, Globe, Palette } from 'lucide-react';
+import { Loader2, Check, Store, ImageIcon, Upload, Globe, Palette, Volume2, Clock } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
+import { createSound } from '@/lib/sounds';
 
 export default function SettingsPage() {
     const { t, lang } = useTranslation();
@@ -19,6 +20,14 @@ export default function SettingsPage() {
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [themeColor, setThemeColor] = useState('#f97316');
+    const [selectedSound, setSelectedSound] = useState('ding');
+    const [cancelLimit, setCancelLimit] = useState(2); // default 2 min
+    const [thankYouMessage, setThankYouMessage] = useState('');
+
+    useEffect(() => {
+        const savedSound = localStorage.getItem('digirestau_sound');
+        if (savedSound) setSelectedSound(savedSound);
+    }, []);
 
     const themes = [
         { name: 'Saffron', primary: '#F4622A', secondary: '#FF8C5A' },
@@ -60,6 +69,8 @@ export default function SettingsPage() {
             setSlug(restaurant.slug);
             setThemeColor(restaurant.theme_color || '#F4622A');
             setLogoUrl(restaurant.logo_url || '');
+            setCancelLimit(restaurant.cancel_time_limit ?? 2);
+            setThankYouMessage(restaurant.thank_you_message || '');
         }
     }, [restaurant]);
 
@@ -83,7 +94,9 @@ export default function SettingsPage() {
                     slug: finalSlug,
                     logo_url: logoUrl.trim() || null,
                     theme_color: themeColor,
-                    language: lang
+                    language: lang,
+                    cancel_time_limit: cancelLimit,
+                    thank_you_message: thankYouMessage.trim() || null
                 })
                 .eq('id', restaurant.id);
             if (error) throw error;
@@ -93,6 +106,8 @@ export default function SettingsPage() {
                 slug: finalSlug,
                 logo_url: logoUrl.trim() || null,
                 theme_color: themeColor,
+                cancel_time_limit: cancelLimit,
+                thank_you_message: thankYouMessage.trim() || null
             });
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
@@ -247,9 +262,116 @@ export default function SettingsPage() {
                     </div>
                 </div>
 
-                {/* Sidebar Settings */}
+                {/* Sidebar Settings Column */}
                 <div className="space-y-8">
+                    {/* Order Cancellation Time Panel */}
+                    <div className="bg-dark-2 border border-white/10 rounded-[32px] p-8 shadow-2xl">
+                        <div className="flex items-center gap-3 mb-1">
+                            <div className="p-2 bg-orange-500/10 rounded-xl">
+                                <Clock className="w-5 h-5 text-orange-500" />
+                            </div>
+                            <h3 className="text-xl font-bold text-text-main font-fraunces">Cancel Time Limit</h3>
+                        </div>
+                        <p className="text-text-muted text-sm ml-11 mb-8 opacity-60">How long can customers cancel after ordering?</p>
 
+                        <div className="grid grid-cols-2 gap-3">
+                            {[1, 2, 3, 5, 10].map(min => (
+                                <button
+                                    key={min}
+                                    onClick={() => setCancelLimit(min)}
+                                    className={`py-3 rounded-2xl border text-xs font-bold transition-all ${cancelLimit === min ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20' : 'bg-white/5 border-white/10 text-text-muted hover:border-white/20'}`}
+                                >
+                                    {min} min
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => setCancelLimit(0)}
+                                className={`py-3 rounded-2xl border text-xs font-bold transition-all ${cancelLimit === 0 ? 'bg-red-500/10 text-red-400 border-red-500/20 shadow-lg shadow-red-500/10' : 'bg-white/5 border-white/10 text-text-muted hover:border-white/20'}`}
+                            >
+                                🚫 No Cancel
+                            </button>
+                        </div>
+                        
+                        <p className="mt-8 ml-1 text-[10px] font-medium text-text-muted opacity-60 text-center">
+                            {cancelLimit === 0 
+                                ? 'Customers cannot cancel orders'
+                                : `Customers can cancel within ${cancelLimit} min`
+                            }
+                        </p>
+                    </div>
+                    
+                    {/* Thank You Message Panel */}
+                    <div className="bg-dark-2 border border-white/10 rounded-[32px] p-8 shadow-2xl">
+                        <div className="flex items-center gap-3 mb-1">
+                            <div className="p-2 bg-green-500/10 rounded-xl">
+                                <Check className="w-5 h-5 text-green-500" />
+                            </div>
+                            <h3 className="text-xl font-bold text-text-main font-fraunces">Thank You Message</h3>
+                        </div>
+                        <p className="text-text-muted text-sm ml-11 mb-8 opacity-60">Yeh message customer ko order ready hone ke baad dikhega.</p>
+
+                        <div className="space-y-4">
+                            <textarea
+                                value={thankYouMessage}
+                                onChange={(e) => setThankYouMessage(e.target.value)}
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-text-main text-sm focus:border-saffron/50 transition-all outline-none resize-none"
+                                rows={3}
+                                placeholder="Khana enjoy kiya? Dobara aana! Aur payment counter par karein. 🙏"
+                                maxLength={200}
+                            />
+                            <p className="text-[10px] text-text-muted opacity-60 ml-1">
+                                Tip: Payment instruction bhi yahan likho — "Counter par payment karein"
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Notification Sound Panel */}
+                    <div className="bg-dark-2 border border-white/10 rounded-[32px] p-8 shadow-2xl">
+                        <div className="flex items-center gap-3 mb-1">
+                            <div className="p-2 bg-saffron/10 rounded-xl">
+                                <Volume2 className="w-5 h-5 text-saffron" />
+                            </div>
+                            <h3 className="text-xl font-bold text-text-main font-fraunces">Notification Sound</h3>
+                        </div>
+                        <p className="text-text-muted text-sm ml-11 mb-8 opacity-60">Choose sound when new order arrives.</p>
+
+                        <div className="grid grid-cols-1 gap-4">
+                            {[
+                                { id: 'ding', label: '🔔 Ding', desc: 'Simple single ding' },
+                                { id: 'chime', label: '🎵 Chime', desc: 'Triple chime melody' },
+                                { id: 'bell', label: '🛎️ Bell', desc: 'Restaurant bell' },
+                                { id: 'alert', label: '⚡ Alert', desc: 'Urgent alert' },
+                            ].map(sound => (
+                                <div 
+                                    key={sound.id}
+                                    className={`relative p-4 rounded-2xl border transition-all cursor-pointer group ${selectedSound === sound.id ? 'bg-saffron/10 border-saffron/30 ring-4 ring-saffron/5' : 'bg-white/5 border-white/10 hover:border-white/20'}`}
+                                    onClick={() => {
+                                        setSelectedSound(sound.id);
+                                        createSound(sound.id); // preview
+                                        localStorage.setItem('digirestau_sound', sound.id);
+                                    }}
+                                >
+                                    <div className="flex flex-col gap-1">
+                                        <span className={`text-sm font-bold transition-colors ${selectedSound === sound.id ? 'text-saffron' : 'text-text-main'}`}>{sound.label}</span>
+                                        <span className="text-[10px] text-text-muted opacity-60">{sound.desc}</span>
+                                    </div>
+                                    
+                                    <div className="mt-3 flex items-center justify-between">
+                                        <button className="text-[10px] font-black uppercase tracking-widest text-saffron opacity-80 group-hover:opacity-100 flex items-center gap-1">
+                                            ▶ Preview
+                                        </button>
+                                        {selectedSound === sound.id && (
+                                            <div className="w-5 h-5 bg-saffron rounded-full flex items-center justify-center shadow-lg shadow-saffron/20">
+                                                <Check className="w-3 h-3 text-white" strokeWidth={4} />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Preview & Save Panel */}
                     <div className="bg-saffron/5 border border-saffron/20 rounded-[32px] p-8">
                         <h4 className="text-lg font-bold text-text-main font-fraunces mb-4">Preview & Save</h4>
                         <p className="text-xs text-text-muted mb-6 leading-relaxed">
