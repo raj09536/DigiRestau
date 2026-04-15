@@ -35,6 +35,15 @@ export const metadata: Metadata = {
   title: "digiRestau — Apne Restaurant ko Digital Banao | Free Digital Menu",
   description: "Apne restaurant ka digital menu banao. QR code se order lein, real-time track karein. 200+ restaurants trust digiRestau. Free mein shuru karein!",
   keywords: ["digital menu", "restaurant", "QR code", "order management", "digiRestau", "Indian restaurant", "free menu"],
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+    shortcut: "/favicon.png",
+  },
+  openGraph: {
+    title: "digiRestau — Apne Restaurant ko Digital Banao",
+    description: "Apne restaurant ka digital menu banao. QR code se order lein, real-time track karein. 200+ restaurants trust digiRestau. Free mein shuru karein!",
+  },
 };
 
 import { RestaurantProvider } from "@/lib/restaurant-context";
@@ -53,6 +62,9 @@ export default function RootLayout({
         '--font-sans': dmSans.style.fontFamily,
       } as React.CSSProperties}>
       <head>
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

@@ -30,10 +30,22 @@ export default function LandingNavbar() {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-lg bg-saffron flex items-center justify-center relative shadow-lg shadow-saffron/20 group-hover:scale-110 transition-transform">
-            <span className="text-white text-lg font-bold">d</span>
-            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-gold border-2 border-dark animate-pulse-custom" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="digiRestau"
+            width={36}
+            height={36}
+            style={{ objectFit: 'contain' }}
+            className="group-hover:scale-110 transition-transform"
+            onError={(e) => {
+              const target = e.currentTarget;
+              target.style.display = 'none';
+              const fallback = document.createElement('div');
+              fallback.className = 'w-8 h-8 rounded-lg bg-saffron flex items-center justify-center shadow-lg';
+              fallback.innerHTML = '<span class="text-white text-lg font-bold">d</span>';
+              target.parentNode?.insertBefore(fallback, target);
+            }}
+          />
           <span className="text-2xl font-fraunces font-bold tracking-tight text-white">
             digi<span style={{ color: '#F4622A' }}>Restau</span>
           </span>

@@ -111,7 +111,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     {/* Logo Section */}
                     <div className="px-7 py-10">
                         <Link href="/dashboard" className="flex items-center gap-3 mb-1 group">
-                            <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">🍽️</span>
+                            <img
+                                src="/logo.png"
+                                alt="digiRestau"
+                                width={32}
+                                height={32}
+                                style={{ objectFit: 'contain' }}
+                                className="group-hover:rotate-12 transition-transform duration-300"
+                                onError={(e) => {
+                                    const target = e.currentTarget;
+                                    target.style.display = 'none';
+                                    const fallback = document.createElement('span');
+                                    fallback.className = 'text-2xl group-hover:rotate-12 transition-transform duration-300';
+                                    fallback.textContent = '🍽️';
+                                    target.parentNode?.insertBefore(fallback, target);
+                                }}
+                            />
                             <span className="text-xl font-bold text-text-main font-fraunces tracking-tight">
                                 digi<span className="text-saffron">Restau</span>
                             </span>
