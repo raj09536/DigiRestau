@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
 import { Eye, EyeOff, ArrowRight, Check } from 'lucide-react';
 
-export default function SignupPage() {
+function SignupForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [restaurantName, setRestaurantName] = useState('');
@@ -329,3 +329,16 @@ export default function SignupPage() {
         </div>
     );
 }
+
+export default function SignupPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-dark">
+                <div className="w-12 h-12 border-4 border-saffron/20 border-t-saffron rounded-full animate-spin" />
+            </div>
+        }>
+            <SignupForm />
+        </Suspense>
+    );
+}
+
