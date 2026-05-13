@@ -61,15 +61,15 @@ export async function POST(req: NextRequest) {
             yearly: 3999
         };
 
-        // Payment record save karo
-        await supabaseAdmin.from('payments').insert({
+        // Payment record update/save (upsert to handle webhook race condition)
+        await supabaseAdmin.from('payments').upsert({
             restaurant_id,
             razorpay_order_id,
             razorpay_payment_id,
             amount: amounts[plan] || 499,
             plan,
             status: 'paid',
-        });
+        }, { onConflict: 'razorpay_order_id' });
 
         return NextResponse.json({ success: true });
     } catch (error) {

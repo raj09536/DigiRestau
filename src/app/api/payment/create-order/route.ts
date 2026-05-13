@@ -18,13 +18,24 @@ export async function POST(req: NextRequest) {
 
         const { plan = 'pro' } = await req.json();
         
+        // Fetch restaurant_id
+        const { data: restaurant } = await supabase
+            .from('restaurants')
+            .select('id')
+            .eq('owner_id', user.id)
+            .single();
+
+        if (!restaurant) {
+            return NextResponse.json({ error: 'Restaurant not found' }, { status: 404 });
+        }
+
         // Prices in paise (₹1 = 100 paise)
         const prices: Record<string, number> = {
             starter: 9900,
             pro: 49900,
             max: 99900,
-            monthly: 49900, // Legacy support
-            yearly: 399900  // Legacy support
+            monthly: 49900,
+            yearly: 399900
         };
 
         const amount = prices[plan] || 49900;
@@ -34,8 +45,18 @@ export async function POST(req: NextRequest) {
             currency: 'INR',
             notes: {
                 user_id: user.id,
+                restaurant_id: restaurant.id,
                 plan,
             },
+        });
+
+        // Save pending payment record for webhook backup
+        await supabase.from('payments').insert({
+            restaurant_id: restaurant.id,
+            razorpay_order_id: order.id,
+            amount: amount / 100,
+            plan,
+            status: 'pending',
         });
 
         return NextResponse.json({
