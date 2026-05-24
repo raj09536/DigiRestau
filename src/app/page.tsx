@@ -386,8 +386,7 @@ export default function LandingPage() {
               <div className="mb-10 text-left">
                 <h3 className="text-2xl font-fraunces font-bold mb-2">Starter</h3>
                 <div className="text-4xl font-bold flex items-baseline gap-1">
-                  {currency.symbol}{getPrice('starter')}
-                  <span className="text-sm font-medium text-text-muted">/{billingPeriod === 'monthly' ? 'mo' : 'yr'}</span>
+                  Free
                 </div>
                 <p className="text-xs text-text-muted mt-2">Perfect for digital menus</p>
               </div>

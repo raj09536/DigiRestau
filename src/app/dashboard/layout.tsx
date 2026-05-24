@@ -56,8 +56,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 setRestaurant(data);
                 
                 if (!data.is_premium) {
-                    setShowUpgradeModal(true);
-                    setIsMandatoryUpgrade(true);
+                    if (data.plan_tier === 'starter') {
+                        try {
+                            const res = await fetch('/api/payment/activate-free', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                            });
+                            if (res.ok) {
+                                data.is_premium = true;
+                                setRestaurant({ ...data, is_premium: true });
+                            } else {
+                                setShowUpgradeModal(true);
+                                setIsMandatoryUpgrade(true);
+                            }
+                        } catch (err) {
+                            console.error('Error auto-activating starter plan:', err);
+                            setShowUpgradeModal(true);
+                            setIsMandatoryUpgrade(true);
+                        }
+                    } else {
+                        setShowUpgradeModal(true);
+                        setIsMandatoryUpgrade(true);
+                    }
                 }
                 
                 // Fetch item count for nudges

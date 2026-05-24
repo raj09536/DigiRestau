@@ -23,7 +23,7 @@ const PLANS = [
     {
         id: 'starter',
         name: 'Starter',
-        price: 99,
+        price: 0,
         icon: Zap,
         description: 'Perfect for digital menus',
         features: [
@@ -94,6 +94,27 @@ export default function UpgradeModal({ isOpen, onClose, isMandatory }: UpgradeMo
         setError('');
 
         try {
+            if (selectedPlan.id === 'starter') {
+                const res = await fetch('/api/payment/activate-free', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                if (res.ok) {
+                    setRestaurant({ 
+                        ...restaurant, 
+                        is_premium: true,
+                        plan_tier: 'starter'
+                    });
+                    setSuccess(true);
+                } else {
+                    const errData = await res.json();
+                    setError(errData.error || 'Starter plan activate nahi ho saka.');
+                }
+                setLoading(false);
+                return;
+            }
+
             // Step 1: Server se order create karo
             const res = await fetch('/api/payment/create-order', {
                 method: 'POST',
@@ -293,6 +314,11 @@ export default function UpgradeModal({ isOpen, onClose, isMandatory }: UpgradeMo
                             >
                                 {loading ? (
                                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                ) : selectedPlan.id === 'starter' ? (
+                                    <>
+                                        <Zap className="w-3.5 h-3.5" />
+                                        Get Starter for Free
+                                    </>
                                 ) : (
                                     <>
                                         <Zap className="w-3.5 h-3.5" />

@@ -99,6 +99,7 @@ function SignupForm() {
                 slug: slug,
                 owner_id: data.user?.id,
                 plan_tier: plan,
+                is_premium: plan === 'starter',
             });
 
             if (dbError) {
