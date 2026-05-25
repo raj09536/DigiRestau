@@ -64,7 +64,7 @@ export default function LandingPage() {
   const getPrice = (plan: 'starter' | 'pro' | 'max') => {
     const isINR = currency.code === 'INR';
     const prices = {
-      starter: { monthly: isINR ? '99' : '3', yearly: isINR ? '950' : '28' },
+      starter: { monthly: '0', yearly: '0' },
       pro: { monthly: isINR ? '499' : '12', yearly: isINR ? '4,790' : '115' },
       max: { monthly: isINR ? '999' : '25', yearly: isINR ? '9,590' : '240' },
     };
