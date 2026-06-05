@@ -35,18 +35,31 @@ export async function proxy(request: NextRequest) {
 
     const { pathname } = request.nextUrl;
 
+    // Check if user is admin by email list
+    const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || 'hello@digirestau.com').split(',');
+    let isAdmin = user?.email ? adminEmails.includes(user.email) : false;
+
     // Protected routes: Redirect to login if not authenticated
-    if (!user && pathname.startsWith('/dashboard')) {
+    if (!user && (pathname.startsWith('/dashboard') || pathname.startsWith('/admin'))) {
         const url = request.nextUrl.clone();
         url.pathname = '/login';
         return NextResponse.redirect(url);
     }
 
-    // Auth routes: Redirect to dashboard if already authenticated
-    if (user && (pathname === '/login' || pathname === '/signup')) {
+    // Redirect admin to /admin if they try to access /dashboard or /login or /signup
+    if (user && isAdmin && (pathname.startsWith('/dashboard') || pathname === '/login' || pathname === '/signup')) {
         const url = request.nextUrl.clone();
-        url.pathname = '/dashboard';
+        url.pathname = '/admin';
         return NextResponse.redirect(url);
+    }
+
+    // Redirect normal user to /dashboard if they try to access /login or /signup or /admin
+    if (user && !isAdmin) {
+        if (pathname === '/login' || pathname === '/signup' || pathname.startsWith('/admin')) {
+            const url = request.nextUrl.clone();
+            url.pathname = '/dashboard';
+            return NextResponse.redirect(url);
+        }
     }
 
     return response;
@@ -55,6 +68,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
     matcher: [
         '/dashboard/:path*', 
+        '/admin/:path*',
         '/login', 
         '/signup'
     ],

@@ -22,6 +22,7 @@ import {
     Users,
     Palette,
     QrCode,
+    Shield,
 } from 'lucide-react';
 
 import UpgradeModal from '@/components/UpgradeModal';
@@ -35,6 +36,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const [nudgeMessageIndex, setNudgeMessageIndex] = useState(0);
     const [itemCount, setItemCount] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [isAdmin, setIsAdmin] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
     const supabase = createClient();
@@ -47,14 +49,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 router.push('/login');
                 return;
             }
+
+            // Check if admin
+            const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || 'hello@digirestau.com').split(',');
+            if (user.email && adminEmails.includes(user.email)) {
+                setIsAdmin(true);
+            }
+
             const { data } = await supabase
                 .from('restaurants')
                 .select('*')
                 .eq('owner_id', user.id)
-                .single();
+                .maybeSingle();
             if (data) {
                 setRestaurant(data);
-                
+                if (data.is_admin) {
+                    setIsAdmin(true);
+                }
+
                 if (!data.is_premium) {
                     if (data.plan_tier === 'starter') {
                         try {
@@ -79,7 +91,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         setIsMandatoryUpgrade(true);
                     }
                 }
-                
+
                 // Fetch item count for nudges
                 const { count } = await supabase
                     .from('menu_items')
@@ -135,7 +147,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     };
 
     const navItems = [
-        { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+        { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, minPlan: 'pro' },
         { href: '/dashboard/orders', label: 'Live Orders', icon: ShoppingBag, badge: activeOrderCount > 0, badgeCount: activeOrderCount, minPlan: 'pro' },
         { href: '/dashboard/menu', label: 'Menu', icon: UtensilsCrossed },
         { href: '/dashboard/qr', label: 'QR Codes', icon: QrCode, maxPlan: 'starter' },
@@ -145,9 +157,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { href: '/dashboard/inventory', label: 'Inventory', icon: Package, isPremium: true, minPlan: 'max' },
         { href: '/dashboard/team', label: 'Team', icon: Users, isPremium: true, minPlan: 'max' },
         { href: '/dashboard/settings', label: 'Settings', icon: Settings },
+        ...(isAdmin ? [{ href: '/admin', label: 'Admin Panel', icon: Shield }] : [])
     ].filter(item => {
         if (!restaurant) return true;
-        
+
         const tiers = ['starter', 'pro', 'max'];
         const currentTierIdx = tiers.indexOf(restaurant.plan_tier || 'starter');
 
@@ -160,7 +173,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             const maxTierIdx = tiers.indexOf(item.maxPlan);
             if (currentTierIdx > maxTierIdx) return false;
         }
-        
+
         return true;
     });
 
@@ -229,11 +242,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     key={item.href}
                                     href={item.href}
                                     onClick={() => setSidebarOpen(false)}
-                                    className={`flex items-center gap-3 px-4 py-3.5 text-sm font-bold rounded-2xl transition-all relative group ${
-                                        active 
-                                        ? 'bg-saffron text-white shadow-lg shadow-saffron/20' 
-                                        : 'text-text-muted hover:text-text-main hover:bg-white/5'
-                                    }`}
+                                    className={`flex items-center gap-3 px-4 py-3.5 text-sm font-bold rounded-2xl transition-all relative group ${active
+                                            ? 'bg-saffron text-white shadow-lg shadow-saffron/20'
+                                            : 'text-text-muted hover:text-text-main hover:bg-white/5'
+                                        }`}
                                 >
                                     <item.icon className={`w-5 h-5 transition-transform duration-300 ${active ? '' : 'group-hover:scale-110'}`} />
                                     <span>{item.label}</span>
@@ -252,7 +264,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     {/* Bottom Section */}
                     <div className="p-6 border-t border-white/5 space-y-4">
                         {restaurant?.plan_tier !== 'max' && (
-                            <div 
+                            <div
                                 className="sidebar-upgrade-box group"
                                 onClick={() => setShowUpgradeModal(true)}
                             >
@@ -285,20 +297,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Mobile Overlay */}
             {sidebarOpen && (
-                <div 
-                    className="fixed inset-0 z-550 bg-black/90 backdrop-blur-sm lg:hidden transition-opacity duration-500" 
-                    onClick={() => setSidebarOpen(false)} 
+                <div
+                    className="fixed inset-0 z-550 bg-black/90 backdrop-blur-sm lg:hidden transition-opacity duration-500"
+                    onClick={() => setSidebarOpen(false)}
                 />
             )}
 
             {/* Main Content Area */}
             <div className="flex-1 lg:ml-[240px] min-h-screen flex flex-col relative bg-dark">
                 {/* Header */}
-                <header className="sticky top-0 z-30 h-20 flex items-center justify-between px-8 dashboard-header border-b border-white/5">
+                <header className="sticky top-0 z-30 h-20 flex items-center justify-between px-4 sm:px-8 dashboard-header border-b border-white/5">
                     <div className="flex items-center gap-4">
-                        <button 
-                            onClick={() => setSidebarOpen(true)} 
-                            className="lg:hidden p-2 rounded-xl bg-white/5 border border-white/10 text-text-main"
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="lg:hidden p-2 rounded-xl bg-white/5 border border-white/10 text-white"
                         >
                             <MenuIcon className="w-6 h-6" />
                         </button>
@@ -309,11 +321,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             <p className="text-[10px] font-black text-text-muted uppercase tracking-widest opacity-40 hidden sm:block">Dashboard / {getPageTitle()}</p>
                         </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-6">
                         {/* Premium Button/Badge */}
                         {!restaurant?.is_premium && (
-                            <button 
+                            <button
                                 onClick={() => setShowUpgradeModal(true)}
                                 className="get-premium-btn hidden md:flex"
                             >
@@ -328,7 +340,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 <span>✦</span> Pro
                             </div>
                         )}
-                        
+
                         <div className="flex items-center gap-4 pl-6 border-l border-white/10">
                             <div className="text-right hidden lg:block">
                                 <p className="text-xs font-black text-text-main uppercase tracking-wider">{restaurant?.name || 'Restaurant'}</p>
@@ -342,7 +354,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 p-8 animate-fade-in relative z-10 w-full max-w-7xl mx-auto">
+                <main className="flex-1 p-4 sm:p-8 animate-fade-in relative z-10 w-full max-w-7xl mx-auto">
                     {children}
                 </main>
             </div>
@@ -350,8 +362,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Upgrade Modal */}
             {showUpgradeModal && (
-                <UpgradeModal 
-                    isOpen={showUpgradeModal} 
+                <UpgradeModal
+                    isOpen={showUpgradeModal}
                     onClose={() => !isMandatoryUpgrade && setShowUpgradeModal(false)}
                     isMandatory={isMandatoryUpgrade}
                 />

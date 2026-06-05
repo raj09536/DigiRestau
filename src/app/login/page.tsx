@@ -32,8 +32,26 @@ export default function LoginPage() {
             return;
         }
 
-        // Step 2: Redirect to dashboard
-        router.push('/dashboard');
+        // Step 2: Redirect based on admin status
+        const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || 'hello@digirestau.com').split(',');
+        let isAdmin = data.user?.email ? adminEmails.includes(data.user.email) : false;
+
+        if (!isAdmin && data.user) {
+            const { data: restData } = await supabase
+                .from('restaurants')
+                .select('is_admin')
+                .eq('owner_id', data.user.id)
+                .maybeSingle();
+            if (restData?.is_admin) {
+                isAdmin = true;
+            }
+        }
+
+        if (isAdmin) {
+            router.push('/admin');
+        } else {
+            router.push('/dashboard');
+        }
 
         setLoading(false);
     };

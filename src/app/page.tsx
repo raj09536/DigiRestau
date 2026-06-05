@@ -8,23 +8,56 @@ import LandingFooter from '@/components/LandingFooter';
 
 
 export default function LandingPage() {
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
-  const [currency, setCurrency] = useState<{ symbol: string; code: string }>({ symbol: '₹', code: 'INR' });
   const [isClient, setIsClient] = useState(false);
+
+  // Contact form state
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactMessage, setContactMessage] = useState('');
+  const [submittingContact, setSubmittingContact] = useState(false);
+  const [contactSuccess, setContactSuccess] = useState(false);
+  const [contactError, setContactError] = useState<string | null>(null);
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactName.trim() || !contactEmail.trim() || !contactMessage.trim()) {
+      setContactError('Please fill out all fields.');
+      return;
+    }
+    setSubmittingContact(true);
+    setContactError(null);
+    setContactSuccess(false);
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: contactName,
+          email: contactEmail,
+          message: contactMessage,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to send message.');
+      }
+
+      setContactSuccess(true);
+      setContactName('');
+      setContactEmail('');
+      setContactMessage('');
+    } catch (err: any) {
+      setContactError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setSubmittingContact(false);
+    }
+  };
 
   useEffect(() => {
     setIsClient(true);
     
-    // IP-based currency detection
-    fetch('https://ipapi.co/json/')
-      .then(res => res.json())
-      .then(data => {
-        if (data.country_code !== 'IN') {
-          setCurrency({ symbol: '$', code: 'USD' });
-        }
-      })
-      .catch(() => {});
-
     // Scroll reveal observer
     const observerOptions = {
       threshold: 0.1,
@@ -59,16 +92,6 @@ export default function LandingPage() {
         behavior: 'smooth'
       });
     }
-  };
-
-  const getPrice = (plan: 'starter' | 'pro' | 'max') => {
-    const isINR = currency.code === 'INR';
-    const prices = {
-      starter: { monthly: '0', yearly: '0' },
-      pro: { monthly: isINR ? '499' : '12', yearly: isINR ? '4,790' : '115' },
-      max: { monthly: isINR ? '999' : '25', yearly: isINR ? '9,590' : '240' },
-    };
-    return billingPeriod === 'monthly' ? prices[plan].monthly : prices[plan].yearly;
   };
 
   return (
@@ -351,148 +374,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ===== PRICING SECTION ===== */}
-      <section id="pricing" className="py-24 lg:py-48 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="reveal mb-20 text-center flex flex-col items-center">
-            <span className="text-saffron text-sm font-bold uppercase tracking-[0.2em] mb-4">Investment</span>
-            <h2 className="text-4xl lg:text-6xl font-fraunces font-bold mb-10">Simple, honest pricing</h2>
-
-            {/* Billing Toggle */}
-            <div className="flex items-center gap-4 bg-dark-3 p-1 rounded-2xl border border-white/5">
-              <button
-                onClick={() => setBillingPeriod('monthly')}
-                className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${billingPeriod === 'monthly' ? 'bg-saffron text-white shadow-lg' : 'text-text-muted hover:text-white'}`}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setBillingPeriod('yearly')}
-                className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${billingPeriod === 'yearly' ? 'bg-saffron text-white shadow-lg' : 'text-text-muted hover:text-white'}`}
-              >
-                Yearly
-              </button>
-            </div>
-            {billingPeriod === 'yearly' && (
-              <div className="mt-4 animate-fade-in">
-                <span className="px-3 py-1 bg-green/10 text-green rounded-full text-[10px] font-bold uppercase tracking-widest">Save 20% on Yearly</span>
-              </div>
-            )}
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* STARTER Plan */}
-            <div className="reveal bg-dark-2 rounded-[40px] p-8 border border-white/10 flex flex-col h-full hover:border-white/20 transition-colors">
-              <div className="mb-10 text-left">
-                <h3 className="text-2xl font-fraunces font-bold mb-2">Starter</h3>
-                <div className="text-4xl font-bold flex items-baseline gap-1">
-                  Free
-                </div>
-                <p className="text-xs text-text-muted mt-2">Perfect for digital menus</p>
-              </div>
-
-              <ul className="space-y-4 mb-12 flex-1 text-left plan-features text-sm">
-                {[
-                  { label: 'QR Menu Generation', check: true },
-                  { label: '10+ Premium Templates', check: true },
-                  { label: 'Unlimited Items & Tables', check: true },
-                  { label: 'View-only access', check: true },
-                  { label: 'Customer Orders', check: false },
-                  { label: 'Live Notifications', check: false },
-                ].map((item, i) => (
-                  <li key={i} className={!item.check ? 'unavailable' : ''}>
-                    {item.check ? <Check className="feat-check" /> : <X className="feat-cross" />}
-                    {item.label}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href="/signup?plan=starter"
-                className="w-full py-4 rounded-2xl border border-white/10 font-bold text-center hover:bg-white/5 transition-all"
-              >
-                Choose Starter
-              </Link>
-            </div>
-
-            {/* PRO Plan */}
-            <div className="reveal reveal-delay-1 bg-dark-2 rounded-[40px] p-8 border-2 border-saffron flex flex-col h-full relative shadow-[0_30px_60px_rgba(244,98,42,0.15)] overflow-hidden price-card featured">
-               <div className="absolute top-0 right-0 w-32 h-32 bg-saffron/5 rounded-full blur-3xl pointer-events-none" />
-               <div className="absolute top-4 right-6">
-                 <span className="px-3 py-1 bg-saffron text-white text-[9px] font-black uppercase tracking-widest rounded-full">⭐ Popular</span>
-               </div>
-
-              <div className="mb-10 text-left">
-                <h3 className="text-2xl font-fraunces font-bold mb-2">Pro Plan</h3>
-                <div className="text-4xl font-bold flex items-baseline gap-1">
-                  {currency.symbol}{getPrice('pro')}
-                  <span className="text-sm font-medium text-text-muted">/{billingPeriod === 'monthly' ? 'mo' : 'yr'}</span>
-                </div>
-                <p className="text-xs text-text-muted mt-2">Complete ordering system</p>
-              </div>
-
-              <ul className="space-y-4 mb-12 flex-1 text-left plan-features text-sm">
-                {[
-                  { label: 'Everything in Starter', check: true },
-                  { label: 'Accept Live Orders', check: true },
-                  { label: 'Sound Notifications', check: true },
-                  { label: 'Order Management', check: true },
-                  { label: 'Table Status Tracking', check: true },
-                  { label: 'Priority Support', check: true },
-                ].map((item, i) => (
-                  <li key={i}>
-                    <Check className="feat-check" style={{ color: '#4CAF7D' }} />
-                    {item.label}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href="/signup?plan=pro"
-                className="w-full py-4 rounded-2xl bg-saffron text-white font-bold text-center shadow-xl shadow-saffron/30 hover:bg-saffron-light transition-all flex items-center justify-center gap-2"
-              >
-                Choose Pro <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            {/* MAX Plan */}
-            <div className="reveal reveal-delay-2 bg-dark-2 rounded-[40px] p-8 border border-white/10 flex flex-col h-full hover:border-white/20 transition-colors">
-              <div className="mb-10 text-left">
-                <h3 className="text-2xl font-fraunces font-bold mb-2">Max Plan</h3>
-                <div className="text-4xl font-bold flex items-baseline gap-1">
-                  {currency.symbol}{getPrice('max')}
-                  <span className="text-sm font-medium text-text-muted">/{billingPeriod === 'monthly' ? 'mo' : 'yr'}</span>
-                </div>
-                <p className="text-xs text-text-muted mt-2">Unlimited everything</p>
-              </div>
-
-              <ul className="space-y-4 mb-12 flex-1 text-left plan-features text-sm">
-                {[
-                  { label: 'Everything in Pro', check: true },
-                  { label: 'Unlimited Tables & Items', check: true },
-                  { label: 'Advanced Analytics', check: true },
-                  { label: 'Custom Branding', check: true },
-                  { label: '24/7 Dedicated Support', check: true },
-                  { label: 'Future Features Access', check: true },
-                ].map((item, i) => (
-                  <li key={i}>
-                    <Check className="feat-check" style={{ color: '#4CAF7D' }} />
-                    {item.label}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href="/signup?plan=max"
-                className="w-full py-4 rounded-2xl border border-white/10 font-bold text-center hover:bg-white/5 transition-all"
-              >
-                Choose Max
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ===== ABOUT SECTION ===== */}
       <section id="about" className="py-24 lg:py-48 px-6 bg-dark">
         <div className="max-w-7xl mx-auto">
@@ -561,24 +442,64 @@ export default function LandingPage() {
             </div>
 
             <div className="reveal reveal-delay-2">
-              <form className="bg-dark p-8 lg:p-12 rounded-[40px] border border-white/5 space-y-6">
+              <form onSubmit={handleContactSubmit} className="bg-dark p-8 lg:p-12 rounded-[40px] border border-white/5 space-y-6">
+                {contactSuccess && (
+                  <div className="p-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-2xl text-sm font-bold animate-in fade-in slide-in-from-top-2 duration-300">
+                    🎉 Thank you! Your message has been sent successfully. We will get back to you shortly.
+                  </div>
+                )}
+                
+                {contactError && (
+                  <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl text-sm font-bold animate-in fade-in slide-in-from-top-2 duration-300">
+                    ⚠️ {contactError}
+                  </div>
+                )}
+
                 <div className="space-y-2 text-left">
                    <label className="text-[10px] font-bold uppercase tracking-widest text-text-muted ml-1">Full Name</label>
-                   <input type="text" placeholder="e.g. Rajat Verma" className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-saffron transition-all" />
+                   <input 
+                     type="text" 
+                     placeholder="e.g. Rajat Verma" 
+                     value={contactName}
+                     onChange={(e) => setContactName(e.target.value)}
+                     className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-saffron transition-all text-text-main text-sm font-medium" 
+                     required
+                   />
                 </div>
                 <div className="space-y-2 text-left">
                    <label className="text-[10px] font-bold uppercase tracking-widest text-text-muted ml-1">Email Address</label>
-                   <input type="email" placeholder="rajat@restaurant.com" className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-saffron transition-all" />
+                   <input 
+                     type="email" 
+                     placeholder="rajat@restaurant.com" 
+                     value={contactEmail}
+                     onChange={(e) => setContactEmail(e.target.value)}
+                     className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-saffron transition-all text-text-main text-sm font-medium" 
+                     required
+                   />
                 </div>
                 <div className="space-y-2 text-left">
                    <label className="text-[10px] font-bold uppercase tracking-widest text-text-muted ml-1">Message</label>
-                   <textarea rows={4} placeholder="How can we help you?" className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-saffron transition-all resize-none" />
+                   <textarea 
+                     rows={4} 
+                     placeholder="How can we help you?" 
+                     value={contactMessage}
+                     onChange={(e) => setContactMessage(e.target.value)}
+                     className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 outline-none focus:border-saffron transition-all resize-none text-text-main text-sm font-medium" 
+                     required
+                   />
                 </div>
                 <button
-                  type="button"
-                  className="w-full py-5 rounded-2xl bg-saffron text-white font-bold text-lg hover:bg-saffron-light transition-all flex items-center justify-center gap-2"
+                  type="submit"
+                  disabled={submittingContact}
+                  className="w-full py-5 rounded-2xl bg-saffron text-white font-bold text-lg hover:bg-saffron-light transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
-                  <Send className="w-4 h-4" /> Send Message
+                  {submittingContact ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" /> Send Message
+                    </>
+                  )}
                 </button>
               </form>
             </div>

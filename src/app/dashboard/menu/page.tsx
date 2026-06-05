@@ -347,7 +347,8 @@ export default function MenuPage() {
             <div className="flex flex-col lg:flex-row gap-8">
                 {/* Categories Sidebar */}
                 <div className="lg:w-72 shrink-0">
-                    <div className="bg-dark-2 border border-white/10 rounded-[32px] p-6 shadow-2xl sticky top-24">
+                    {/* Desktop Category Sidebar */}
+                    <div className="hidden lg:block bg-dark-2 border border-white/10 rounded-[32px] p-6 shadow-2xl lg:sticky lg:top-24">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-xs font-black uppercase tracking-widest text-text-muted">{t('categories')}</h3>
                             <button
@@ -408,6 +409,68 @@ export default function MenuPage() {
                                     <p className="text-xs text-text-muted opacity-40">No categories found.</p>
                                 </div>
                             )}
+                        </div>
+                    </div>
+
+                    {/* Mobile/Tablet Category Horizonal List */}
+                    <div className="lg:hidden bg-dark-2 border border-white/10 rounded-[24px] p-4 shadow-xl space-y-3">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-xs font-black uppercase tracking-widest text-text-muted">{t('categories')}</h3>
+                            <button
+                                onClick={() => openCategoryModal()}
+                                className="p-2 bg-white/5 rounded-lg text-text-muted hover:text-saffron hover:bg-saffron/10 transition-all border border-white/5"
+                            >
+                                <Plus className="w-4 h-4" />
+                            </button>
+                        </div>
+                        
+                        <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar -mx-1 px-1">
+                            <button
+                                onClick={() => setSelectedCategory(null)}
+                                className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                                    !selectedCategory 
+                                    ? 'bg-saffron text-white shadow-lg shadow-saffron/20' 
+                                    : 'bg-white/5 text-text-muted hover:bg-white/10'
+                                }`}
+                            >
+                                <span>{t('all_items')}</span>
+                                <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${!selectedCategory ? 'bg-white/20' : 'bg-white/5'}`}>
+                                    {items.length}
+                                </span>
+                            </button>
+
+                            {categories.map((cat) => {
+                                const count = items.filter((i) => i.category_id === cat.id).length;
+                                const isActive = selectedCategory === cat.id;
+                                return (
+                                    <div key={cat.id} className="flex items-center gap-2 shrink-0">
+                                        <button
+                                            onClick={() => setSelectedCategory(isActive ? null : cat.id)}
+                                            className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                                                isActive 
+                                                ? 'bg-saffron text-white shadow-lg shadow-saffron/20' 
+                                                : 'bg-white/5 text-text-muted hover:bg-white/10'
+                                            }`}
+                                        >
+                                            <span>{cat.name}</span>
+                                            <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${isActive ? 'bg-white/20' : 'bg-white/5'}`}>
+                                                {count}
+                                            </span>
+                                        </button>
+                                        
+                                        {isActive && (
+                                            <div className="flex gap-1 bg-white/5 rounded-full p-0.5 border border-white/5">
+                                                <button onClick={() => openCategoryModal(cat)} className="p-1.5 text-text-muted hover:text-saffron transition-colors">
+                                                    <Pencil className="w-3.5 h-3.5" />
+                                                </button>
+                                                <button onClick={() => deleteCategory(cat.id)} className="p-1.5 text-text-muted hover:text-red-400 transition-colors">
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

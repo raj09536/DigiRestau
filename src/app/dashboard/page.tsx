@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase';
 import { useRestaurant } from '@/lib/restaurant-context';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
     ShoppingBag,
     TrendingUp,
@@ -21,11 +22,45 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const supabase = createClient();
     const { restaurant } = useRestaurant();
-
+    const router = useRouter();
     useEffect(() => {
-        if (!restaurant) return;
-        
+        const checkAdminAndRedirect = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                // Check if admin by email list
+                const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || 'hello@digirestau.com').split(',');
+                let isAdmin = user.email ? adminEmails.includes(user.email) : false;
+
+                if (!isAdmin) {
+                    // Check if admin by database flag
+                    const { data: restData } = await supabase
+                        .from('restaurants')
+                        .select('is_admin')
+                        .eq('owner_id', user.id)
+                        .maybeSingle();
+                    if (restData?.is_admin) {
+                        isAdmin = true;
+                    }
+                }
+
+                if (isAdmin) {
+                    router.push('/admin');
+                    return;
+                }
+            }
+
+            if (!restaurant) return;
+            
+            if (restaurant.plan_tier === 'starter') {
+                router.push('/dashboard/menu');
+                return;
+            }
+
+            fetchData();
+        };
+
         const fetchData = async () => {
+            if (!restaurant) return;
             setLoading(true);
             try {
                 // Fetch stats counts
@@ -73,7 +108,7 @@ export default function DashboardPage() {
             }
         };
 
-        fetchData();
+        checkAdminAndRedirect();
     }, [restaurant]);
 
     const statCards = [

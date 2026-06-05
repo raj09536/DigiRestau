@@ -308,12 +308,12 @@ export default function OrdersPage() {
                         </button>
                         
                         {/* Status Tabs */}
-                        <div className="flex bg-dark-2 p-1 rounded-xl border border-white/10">
+                        <div className="flex bg-dark-2 p-1 rounded-xl border border-white/10 overflow-x-auto max-w-full sm:max-w-none no-scrollbar whitespace-nowrap">
                             {['all', ...statusFlow].map((tab) => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab as any)}
-                                    className={`px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                                    className={`px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shrink-0 ${
                                         activeTab === tab 
                                         ? 'bg-saffron text-white shadow-lg shadow-saffron/20' 
                                         : 'text-text-muted hover:text-text-main'

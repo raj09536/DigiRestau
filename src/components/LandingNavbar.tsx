@@ -8,7 +8,7 @@ const navLinks = [
   { label: 'Features', href: '/#features' },
   { label: 'Upcoming', href: '/upcoming-features' },
   { label: 'How It Works', href: '/#how-it-works' },
-  { label: 'Pricing', href: '/#pricing' },
+  { label: 'Pricing', href: '/pricing' },
   { label: 'About', href: '/#about' },
   { label: 'Contact', href: '/#contact' },
 ];
@@ -78,7 +78,7 @@ export default function LandingNavbar() {
         </div>
 
         {/* Mobile Toggle */}
-        <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden p-2 text-text">
+        <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden p-2 text-white">
           {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
